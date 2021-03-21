@@ -1,0 +1,5 @@
+DerivedData/*
+build/*
+*.yaml
+MacKernelSDK
+Lilu.kext/*
