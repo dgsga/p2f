@@ -3,3 +3,4 @@ build/*
 *.yaml
 MacKernelSDK
 Lilu.kext/*
+.DS_Store
