@@ -93,7 +93,7 @@ static char *twoway_memmem(const unsigned char *h, const unsigned char *z, const
 
 	/* Computing length of needle and fill shift table */
 	for (i=0; i<l; i++)
-		BITOP(byteset, n[i], |=), shift[n[i]] = i+1;
+		(void)BITOP(byteset, n[i], |=), shift[n[i]] = i+1;
 
 	/* Compute maximal suffix */
 	ip = -1; jp = 0; k = p = 1;
