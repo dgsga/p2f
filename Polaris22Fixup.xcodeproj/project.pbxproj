@@ -10,7 +10,6 @@
 		CEDE8D7B22984F8F00C73034 /* libkmod.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CEDE8D6E22984F7700C73034 /* libkmod.a */; };
 		CEDE8D7C22984FE600C73034 /* plugin_start.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CEDE8D7822984F7700C73034 /* plugin_start.cpp */; };
 		CEDE8D7E2298501600C73034 /* kern_start.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CEDE8D7D2298501600C73034 /* kern_start.cpp */; };
-		CEF819E8249862C700EB67BC /* memmem.c in Sources */ = {isa = PBXBuildFile; fileRef = CEF819E7249862C700EB67BC /* memmem.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -58,7 +57,6 @@
 		CEDE8D7822984F7700C73034 /* plugin_start.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = plugin_start.cpp; sourceTree = "<group>"; };
 		CEDE8D7922984F7700C73034 /* LegacyIOService.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LegacyIOService.h; sourceTree = "<group>"; };
 		CEDE8D7D2298501600C73034 /* kern_start.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = kern_start.cpp; sourceTree = "<group>"; };
-		CEF819E7249862C700EB67BC /* memmem.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = memmem.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -95,7 +93,6 @@
 			children = (
 				CEDE8CEC22984C0800C73034 /* Info.plist */,
 				CEDE8D7D2298501600C73034 /* kern_start.cpp */,
-				CEF819E7249862C700EB67BC /* memmem.c */,
 			);
 			path = Polaris22Fixup;
 			sourceTree = "<group>";
@@ -268,7 +265,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CEF819E8249862C700EB67BC /* memmem.c in Sources */,
 				CEDE8D7C22984FE600C73034 /* plugin_start.cpp in Sources */,
 				CEDE8D7E2298501600C73034 /* kern_start.cpp in Sources */,
 			);
