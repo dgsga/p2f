@@ -52,18 +52,7 @@ static inline void searchAndPatch(const void *haystack, size_t haystackSize, con
 
 #pragma mark - Patched functions
 
-// pre Big Sur
-static boolean_t patched_cs_validate_range(vnode_t vp, memory_object_t pager, memory_object_offset_t offset, const void *data, vm_size_t size, unsigned *result) {
-    char path[PATH_MAX];
-    int pathlen = PATH_MAX;
-    boolean_t res = FunctionCast(patched_cs_validate_range, orig_cs_validate)(vp, pager, offset, data, size, result);
-    if (res && vn_getpath(vp, path, &pathlen) == 0 && UserPatcher::matchSharedCachePath(path)) {
-        searchAndPatch(data, PAGE_SIZE, path, kAmdBronzeMtlAddrLibGetBaseArrayModeReturnOriginal, kAmdBronzeMtlAddrLibGetBaseArrayModeReturnPatched);
-    }
-    return res;
-}
-
-// For Big Sur
+// For Big Sur +
 static void patched_cs_validate_page(vnode_t vp, memory_object_t pager, memory_object_offset_t page_offset, const void *data, int *validated_p, int *tainted_p, int *nx_p) {
     char path[PATH_MAX];
     int pathlen = PATH_MAX;
@@ -94,9 +83,7 @@ static void pluginStart() {
     DBGLOG(MODULE_SHORT, "start");
     lilu.onPatcherLoadForce([](void *user, KernelPatcher &patcher) {
         KernelPatcher::RouteRequest csRoute =
-            getKernelVersion() >= KernelVersion::BigSur ?
-            KernelPatcher::RouteRequest("_cs_validate_page", patched_cs_validate_page, orig_cs_validate) :
-            KernelPatcher::RouteRequest("_cs_validate_range", patched_cs_validate_range, orig_cs_validate);
+        KernelPatcher::RouteRequest("_cs_validate_page", patched_cs_validate_page, orig_cs_validate) ;
         if (!patcher.routeMultipleLong(KernelPatcher::KernelID, &csRoute, 1))
             SYSLOG(MODULE_SHORT, "failed to route cs validation pages");
     });
@@ -153,7 +140,7 @@ PluginConfiguration ADDPR(config) {
     arrsize(bootargDebug),
     bootargBeta,
     arrsize(bootargBeta),
-    KernelVersion::Mojave,
+    KernelVersion::BigSur,
     KernelVersion::Monterey,
     pluginStart
 };
