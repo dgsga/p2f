@@ -1,13 +1,13 @@
 Polaris22 Driver Fixup
 ======================
-This KEXT fixes known graphics issues with Polaris22/VegaM on OSX. Only tested/supported on 10.14+.
+This KEXT fixes known graphics issues with Polaris22/VegaM on macOS. Only tested/supported on 11.3+.
 
 * Framebuffer corruption due to Metal driver bug. The details of the issue and the fix can be found [here](https://osy.gitbook.io/hac-mini-guide/details/metal-driver-fix).
-* On 10.14.5 Beta 2 and newer versions, boot fails with accelerator enabled and ends in a black screen.
+* Boot fails with accelerator enabled and ends in a black screen.
 
 ## Installation
 
-* You need Lilu 1.3.8 or newer as older versions had incompatibilities
+* You need Lilu 1.5.1 or newer as older versions had incompatibilities
 * Install the KEXT along with Lilu
 
 ## Implementation
