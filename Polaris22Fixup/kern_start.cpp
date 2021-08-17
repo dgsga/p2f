@@ -114,22 +114,11 @@ static void pluginStart() {
                     SYSLOG(MODULE_SHORT, "failed to patch getHardwareInfo");
                 }
             } else if (i == kAmdRadeonX4000HwLibs && kAMDHWLibsInfo[i].loadIndex == index) {
-                //BigSur
-                if (getKernelVersion() <= KernelVersion::BigSur) {
-                    KernelPatcher::RouteRequest amd_requests[] {
-                        KernelPatcher::RouteRequest("_PECI_IsEarlySAMUInitEnabled", patched_IsEarlySAMUInitEnabled, orig_IsEarlySAMUInitEnabled),
-                    };
-                    if (!patcher.routeMultiple(index, amd_requests, address, size, true, true))
-                        SYSLOG(MODULE_SHORT, "failed to patch PECI_IsEarlySAMUInitEnabled");
-                }
-                //Monterey
-                else {
-                    KernelPatcher::LookupPatch patch = {&kAMDHWLibsInfo[kAmdRadeonX4000HwLibs], kPECI_IsEarlySAMUInitEnabledOriginal, kPECI_IsEarlySAMUInitEnabledPatched, sizeof(kPECI_IsEarlySAMUInitEnabledOriginal), 1};
-                    patcher.applyLookupPatch(&patch);
-                    if (patcher.getError() != KernelPatcher::Error::NoError) {
-                        SYSLOG(MODULE_SHORT, "failed to binary patch PECI_IsEarlySAMUInitEnabled");
-                        patcher.clearError();
-                    }
+                KernelPatcher::LookupPatch patch = {&kAMDHWLibsInfo[kAmdRadeonX4000HwLibs], kPECI_IsEarlySAMUInitEnabledOriginal, kPECI_IsEarlySAMUInitEnabledPatched, sizeof(kPECI_IsEarlySAMUInitEnabledOriginal), 1};
+                patcher.applyLookupPatch(&patch);
+                if (patcher.getError() != KernelPatcher::Error::NoError) {
+                    SYSLOG(MODULE_SHORT, "failed to binary patch PECI_IsEarlySAMUInitEnabled");
+                    patcher.clearError();
                 }
             }
         }
