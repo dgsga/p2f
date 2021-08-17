@@ -25,6 +25,18 @@ static const uint8_t kAmdBronzeMtlAddrLibGetBaseArrayModeReturnPatched[] = {
 
 static_assert(sizeof(kAmdBronzeMtlAddrLibGetBaseArrayModeReturnOriginal) == sizeof(kAmdBronzeMtlAddrLibGetBaseArrayModeReturnPatched), "patch size invalid");
 
+static const uint8_t kPECI_IsEarlySAMUInitEnabledOriginal[] = {
+    0xbe, 0x60, 0x01, 0x00, 0x00, 0xff, 0x90, 0xb8, 0x00, 0x00, 0x00, 0x31, 0xc9, 0x83, 0xf8, 0x01, 0x0f, 0x94, 0xc1, 0x89, 0xc8, 0x5d, 0xc3,
+ };
+
+static const uint8_t kPECI_IsEarlySAMUInitEnabledPatched[] = {
+    0xbe, 0x60, 0x01, 0x00, 0x00, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x31, 0xc9, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x89, 0xc8, 0x5d, 0xc3,
+};
+
+static constexpr size_t kPECI_IsEarlySAMUInitEnabledOriginalSize = sizeof(kPECI_IsEarlySAMUInitEnabledOriginal);
+
+static_assert(kPECI_IsEarlySAMUInitEnabledOriginalSize == sizeof(kPECI_IsEarlySAMUInitEnabledPatched), "patch size invalid");
+
 static const char *kAmdRadeonX4000HwLibsPath[] { "/System/Library/Extensions/AMDRadeonX4000HWServices.kext/Contents/PlugIns/AMDRadeonX4000HWLibs.kext/Contents/MacOS/AMDRadeonX4000HWLibs" };
 
 static const char *kAmdRadeonX4000Path[] { "/System/Library/Extensions/AMDRadeonX4000.kext/Contents/MacOS/AMDRadeonX4000" };
@@ -78,7 +90,6 @@ static int patched_getHardwareInfo(void *obj, uint16_t *hwInfo) {
 #pragma mark - Patches on start/stop
 
 static void pluginStart() {
-    LiluAPI::Error error;
     
     DBGLOG(MODULE_SHORT, "start");
     lilu.onPatcherLoadForce([](void *user, KernelPatcher &patcher) {
@@ -88,34 +99,37 @@ static void pluginStart() {
             SYSLOG(MODULE_SHORT, "failed to route cs validation pages");
     });
 
-    error = lilu.onKextLoad(kAMDHWLibsInfo, arrsize(kAMDHWLibsInfo), [](void *user, KernelPatcher &patcher, size_t index, mach_vm_address_t address, size_t size){
+    lilu.onKextLoad(kAMDHWLibsInfo, arrsize(kAMDHWLibsInfo), [](void *user, KernelPatcher &patcher, size_t index, mach_vm_address_t address, size_t size){
         DBGLOG(MODULE_SHORT, "processing AMDRadeonX4000HWLibs");
         for (size_t i = 0; i < arrsize(kAMDHWLibsInfo); i++) {
             if (i == kAmdRadeonX4000 && kAMDHWLibsInfo[i].loadIndex == index) {
                 KernelPatcher::RouteRequest amd_requests[] {
                     KernelPatcher::RouteRequest("__ZN29AMDRadeonX4000_AMDAccelDevice15getHardwareInfoEP24_sAMD_GET_HW_INFO_VALUES", patched_getHardwareInfo, orig_getHardwareInfo),
                 };
-                if (patcher.routeMultiple(index, amd_requests, address, size, true, true)) {
-                    DBGLOG(MODULE_SHORT, "patched getHardwareInfo");
-                } else {
-                    SYSLOG(MODULE_SHORT, "failed to patch getHardwareInfo: %d", patcher.getError());
+                if (!patcher.routeMultiple(index, amd_requests, address, size, true, true)) {
+                    SYSLOG(MODULE_SHORT, "failed to patch getHardwareInfo");
                 }
             } else if (i == kAmdRadeonX4000HwLibs && kAMDHWLibsInfo[i].loadIndex == index) {
-                KernelPatcher::LookupPatch patch = {&kAMDHWLibsInfo[kAmdRadeonX4000HwLibs], kCAIL_DDI_CAPS_POLARIS22_A0Original, kCAIL_DDI_CAPS_POLARIS22_A0Patched, sizeof(kCAIL_DDI_CAPS_POLARIS22_A0Original), 1};
-                patcher.applyLookupPatch(&patch);
-                if (patcher.getError() != KernelPatcher::Error::NoError) {
-                    SYSLOG(MODULE_SHORT, "failed to binary patch CAIL_DDI_CAPS_POLARIS22_A0: %d", patcher.getError());
-                    patcher.clearError();
+                //BigSur
+                if (getKernelVersion() <= KernelVersion::BigSur) {
+                    KernelPatcher::RouteRequest amd_requests[] {
+                        KernelPatcher::RouteRequest("_PECI_IsEarlySAMUInitEnabled", patched_IsEarlySAMUInitEnabled, orig_IsEarlySAMUInitEnabled),
+                    };
+                    if (!patcher.routeMultiple(index, amd_requests, address, size, true, true))
+                        SYSLOG(MODULE_SHORT, "failed to patch PECI_IsEarlySAMUInitEnabled");
+                }
+                //Monterey
+                else {
+                    KernelPatcher::LookupPatch patch = {&kAMDHWLibsInfo[kAmdRadeonX4000HwLibs], kPECI_IsEarlySAMUInitEnabledOriginal, kPECI_IsEarlySAMUInitEnabledPatched, sizeof(kPECI_IsEarlySAMUInitEnabledOriginal), 1};
+                    patcher.applyLookupPatch(&patch);
+                    if (patcher.getError() != KernelPatcher::Error::NoError) {
+                        SYSLOG(MODULE_SHORT, "failed to binary patch PECI_IsEarlySAMUInitEnabled");
+                        patcher.clearError();
                     }
-                else{
-                    DBGLOG(MODULE_SHORT, "binary patched CAIL_DDI_CAPS_POLARIS22_A0");
                 }
             }
         }
     });
-    if (error != LiluAPI::Error::NoError) {
-        SYSLOG(MODULE_SHORT, "failed to register onKextLoad method: %d", error);
-    }
 }
 
 // Boot args.
