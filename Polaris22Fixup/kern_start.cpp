@@ -75,9 +75,6 @@ static void patched_cs_validate_page(vnode_t vp, memory_object_t pager, memory_o
     }
 }
 
-    }
-}
-
 static int patched_getHardwareInfo(void *obj, uint16_t *hwInfo) {
     int ret = FunctionCast(patched_getHardwareInfo, orig_getHardwareInfo)(obj, hwInfo);
     DBGLOG(MODULE_SHORT, "AMDRadeonX4000_AMDAccelDevice::getHardwareInfo: return 0x%08X");
