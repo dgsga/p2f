@@ -16,11 +16,11 @@
 static const int kEllesmereDeviceId = 0x67DF;
 
 static const uint8_t kAmdBronzeMtlAddrLibGetBaseArrayModeReturnOriginal[] = {
-    0xb8, 0x02, 0x00, 0x00, 0x00, 0x0f, 0x43, 0xc1, 0xeb,
+    0x0f, 0x95, 0xc0, 0x01, 0xc0, 0x83, 0xc0, 0x02, 0x5d, 0xc3, 0x55,
 };
 
 static const uint8_t kAmdBronzeMtlAddrLibGetBaseArrayModeReturnPatched[] = {
-    0xb8, 0x02, 0x00, 0x00, 0x00, 0x90, 0x90, 0x90, 0xeb,
+    0x0f, 0x95, 0xc0, 0x31, 0xc0, 0x83, 0xc0, 0x02, 0x5d, 0xc3, 0x55,
 };
 
 static_assert(sizeof(kAmdBronzeMtlAddrLibGetBaseArrayModeReturnOriginal) == sizeof(kAmdBronzeMtlAddrLibGetBaseArrayModeReturnPatched), "patch size invalid");
@@ -72,7 +72,7 @@ static inline void searchAndPatch(const void *haystack, size_t haystackSize, con
 
 #pragma mark - Patched functions
 
-// For Big Sur +
+// For Monterey 12.3 +
 static void patched_cs_validate_page(vnode_t vp, memory_object_t pager, memory_object_offset_t page_offset, const void *data, int *validated_p, int *tainted_p, int *nx_p) {
     char path[PATH_MAX];
     int pathlen = PATH_MAX;
@@ -148,7 +148,7 @@ PluginConfiguration ADDPR(config) {
     arrsize(bootargDebug),
     bootargBeta,
     arrsize(bootargBeta),
-    KernelVersion::BigSur,
+    KernelVersion::Monterey,
     KernelVersion::Monterey,
     pluginStart
 };
