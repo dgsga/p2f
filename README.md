@@ -1,6 +1,6 @@
 Polaris22 Driver Fixup
 ======================
-This KEXT fixes known graphics issues with Polaris22/VegaM on macOS. Only tested/supported on 11.3+.
+This KEXT fixes known graphics issues with Polaris22/VegaM on macOS. Only tested/supported on 12.3+.
 
 * Framebuffer corruption due to Metal driver bug. The details of the issue and the fix can be found [here](https://osy.gitbook.io/hac-mini-guide/details/metal-driver-fix).
 * Boot fails with accelerator enabled and ends in a black screen.
