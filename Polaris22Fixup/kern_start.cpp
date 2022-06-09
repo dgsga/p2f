@@ -95,7 +95,7 @@ static int patched_getHardwareInfo(void *obj, uint16_t *hwInfo) {
 #pragma mark - Patches on start/stop
 
 static void pluginStart() {
-    
+
     DBGLOG(MODULE_SHORT, "start");
     lilu.onPatcherLoadForce([](void *user, KernelPatcher &patcher) {
         KernelPatcher::RouteRequest csRoute =
@@ -149,6 +149,6 @@ PluginConfiguration ADDPR(config) {
     bootargBeta,
     arrsize(bootargBeta),
     KernelVersion::Monterey,
-    KernelVersion::Monterey,
+    KernelVersion::Ventura,
     pluginStart
 };
